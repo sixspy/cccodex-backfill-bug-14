@@ -90,17 +90,50 @@ async function renderCoverage(){
 }
 
 
+function chipHtml(card){
+  const on = !!(card && (card.lit || card.state === '亮'));
+  return `<span class="tag chip-reject${on?' lit':''}" data-lit="${on?'1':'0'}">${card?.chip||'拒重'} · ${on?'亮':'灭'}</span>`;
+}
+
+async function doClaim(actor){
+  try{
+    const j = await api('/api/claim',{method:'POST',body:JSON.stringify({slice_key:'S9',actor})});
+    setMsg(j.msg || j.chip || '已占片');
+  }catch(e){
+    // 后到被拒：服务回短句，拒重芯片随队列同亮
+    setMsg(e.message, true);
+  }
+  await render_queue();
+}
+
 async function render_queue(){
   const j = await api('/api/claim/panels');
-  view.innerHTML = `<div class="wall">${(j.queue||[]).map(r=>`<article class="card"><h3>${r.slice_key}</h3><p>${r.actor}</p></article>`).join('')||'<p class="muted">空</p>'}
+  const win = j.card?.lit ? '争抢' : '先手';
+  view.innerHTML = `<div class="card" style="margin-bottom:0.85rem">${chipHtml(j.card)} <span class="muted">${win}芯片 · 队列 ${j.water?.count ?? 0} 行</span></div>
+    <div class="wall">${(j.queue||[]).map(r=>`<article class="card ${j.card?.lit?'contended':''}"><h3>${r.slice_key}</h3><p>${r.actor}</p>${r.chip?`<span class="tag">${r.chip}</span>`:''}</article>`).join('')||'<p class="muted">空</p>'}
     <article class="card"><button class="primary" id="a" type="button">仓管A占片</button>
     <button class="primary" id="b" type="button">仓管B占片</button></article></div>`;
-  document.getElementById('a').onclick = async ()=>{ try{ await api('/api/claim',{method:'POST',body:JSON.stringify({slice_key:'S9',actor:'A'})}); setMsg('A'); await render_queue(); }catch(e){setMsg(e.message,true);} };
-  document.getElementById('b').onclick = async ()=>{ try{ await api('/api/claim',{method:'POST',body:JSON.stringify({slice_key:'S9',actor:'B'})}); setMsg('B'); await render_queue(); }catch(e){setMsg(e.message,true);} };
+  document.getElementById('a').onclick = ()=>doClaim('A');
+  document.getElementById('b').onclick = ()=>doClaim('B');
 }
-async function render_detail(){ const j=await api('/api/claim/panels'); view.innerHTML=`<div class="card"><p>灰态 ${j.detail.ui}</p><p>片锁指针 ${j.detail.ptr||'空'}</p><p>可写 ${j.detail.writable}</p></div>`; }
-async function render_card(){ const j=await api('/api/claim/panels'); view.innerHTML=`<div class="card"><span class="tag">${j.card.chip}</span><p>${j.card.fate}</p></div>`; }
-async function render_water(){ const j=await api('/api/claim/panels'); view.innerHTML=`<div class="card"><p>条数 ${j.water.count}</p><p>双份 ${j.water.dup}</p></div>`; }
+async function render_detail(){
+  const j=await api('/api/claim/panels');
+  const d=j.detail;
+  view.innerHTML=`<div class="card">${chipHtml(j.card)}
+    <p>灰态 ${d.ui}</p>
+    <p>片锁指针 ${d.ptr||'空'}</p>
+    <p>持锁仓管 ${d.holder||'空'}</p>
+    <p>可写 ${d.writable}${d.writable==='0'?'（已闭写）':''}</p>
+    ${d.double?'<p class="err">双锁即停</p>':''}</div>`;
+}
+async function render_card(){
+  const j=await api('/api/claim/panels');
+  view.innerHTML=`<div class="card">${chipHtml(j.card)}<p>${j.card.fate}</p><p class="muted">卡片与队列同源</p></div>`;
+}
+async function render_water(){
+  const j=await api('/api/claim/panels');
+  view.innerHTML=`<div class="card">${chipHtml(j.card)}<p>条数 ${j.water.count}（只认先手一行）</p><p>双份 ${j.water.dup}</p></div>`;
+}
 
 async function show(tab){
   setMsg(''); await loadWindows();

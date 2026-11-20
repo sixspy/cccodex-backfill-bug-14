@@ -170,15 +170,17 @@ class ApiClaim:
         try:
             require_user(req)
             body = await req.get_media() or {}
-            _json(
-                resp,
-                claim_svc.claim(
-                    str(body.get("slice_key") or "S9"),
-                    str(body.get("actor") or "A"),
-                ),
+            result = claim_svc.claim(
+                str(body.get("slice_key") or "S9"),
+                str(body.get("actor") or "A"),
             )
+            if result.get("rejected"):
+                # 后到被拒：服务立刻收拢，409 + 短句。
+                _json(resp, result, 409)
+                return
+            _json(resp, result)
         except ServiceError as exc:
-            _json(resp, {"error": exc.message}, exc.status_code)
+            _json(resp, {"error": exc.message, **exc.payload}, exc.status_code)
 
 
 class ApiClaimPanels:

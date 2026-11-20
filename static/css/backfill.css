@@ -46,5 +46,8 @@ h1 { margin: 0.25rem 0 0; font-size: 1.35rem; }
 .muted { color: var(--muted); }
 .err { color: var(--danger); }
 .tag { display:inline-block; padding:0.1rem 0.5rem; border-radius:999px; background:#2a3f66; font-size:0.78rem; }
+.chip-reject { border:1px solid var(--line); background:#2a3f66; color:var(--muted); }
+.chip-reject.lit { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight:650; box-shadow: 0 0 0 2px rgba(240,162,2,0.35); }
+.card.contended { border-color: var(--accent); }
 label { display:block; margin: 0.65rem 0; }
 input, select { width:100%; margin-top:0.3rem; padding:0.5rem 0.65rem; border-radius:10px; border:1px solid var(--line); background:#101b30; color:var(--ink); font:inherit; }
