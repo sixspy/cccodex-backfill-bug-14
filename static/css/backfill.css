@@ -1,0 +1,50 @@
+:root {
+  --bg: #0f1c33;
+  --panel: #182744;
+  --card: #213456;
+  --ink: #e8eef9;
+  --muted: #93a4c3;
+  --accent: #f0a202;
+  --accent-ink: #1b1400;
+  --line: #2c4063;
+  --ok: #3ecf8e;
+  --danger: #ff6b6b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(240,162,2,0.18), transparent 35%),
+    linear-gradient(160deg, #0b1528, var(--bg) 45%, #132447);
+}
+.login-body { display:grid; place-items:center; min-height:100vh; }
+.login-panel, .wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+}
+.login-panel { width: min(400px, 92vw); padding: 1.8rem; }
+.wrap { width: min(1120px, 96vw); margin: 1.2rem auto; padding: 1.2rem 1.3rem 1.6rem; }
+.brand { color: var(--accent); letter-spacing: 0.08em; font-size: 0.78rem; margin: 0; }
+h1 { margin: 0.25rem 0 0; font-size: 1.35rem; }
+.header { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
+.chips { display:flex; flex-wrap:wrap; gap:0.5rem; margin: 1rem 0; }
+.chips button, button {
+  border: 1px solid var(--line); background: #15233d; color: var(--ink);
+  border-radius: 12px; padding: 0.45rem 0.85rem; cursor:pointer; font: inherit;
+}
+.chips button.on, button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 650; }
+.wall { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 0.95rem;
+}
+.card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.muted { color: var(--muted); }
+.err { color: var(--danger); }
+.tag { display:inline-block; padding:0.1rem 0.5rem; border-radius:999px; background:#2a3f66; font-size:0.78rem; }
+label { display:block; margin: 0.65rem 0; }
+input, select { width:100%; margin-top:0.3rem; padding:0.5rem 0.65rem; border-radius:10px; border:1px solid var(--line); background:#101b30; color:var(--ink); font:inherit; }
